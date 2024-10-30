@@ -5,6 +5,10 @@ import { OrbitControls } from './three.js-master/examples/jsm/controls/OrbitCont
 // Create the Scene
 const scene = new THREE.Scene();
 
+// Load textures
+const textureLoader = new THREE.TextureLoader();
+const wallTexture = textureLoader.load('assets/wall.jpg') //Wall Texture
+
 // Create the Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 1.5, 5); // Set camera lower for a more realistic viewpoint
@@ -28,12 +32,12 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white ambien
 scene.add(ambientLight);
 
 // Room Dimensions
-const roomWidth = 10;
+const roomWidth = 50;
 const roomHeight = 8;
-const roomDepth = 10;
+const roomDepth = 50;
 
 // Create the Room (Cube)
-const roomMaterial = new THREE.MeshBasicMaterial({ color: 0xadd8e6, side: THREE.BackSide }); // Light blue color for walls
+const roomMaterial = new THREE.MeshBasicMaterial({ map: wallTexture /*color: 0xadd8e6*/, side: THREE.BackSide }); // Light blue color for walls
 const room = new THREE.Mesh(
   new THREE.BoxGeometry(roomWidth, roomHeight, roomDepth),
   roomMaterial
@@ -50,10 +54,10 @@ floor.receiveShadow = true; // Enable shadow receiving
 scene.add(floor);
 
 // Ceiling
-const ceilingMaterial = new THREE.MeshBasicMaterial({ color: 0xadd8e6 }); // Light blue for the ceiling
+const ceilingMaterial = new THREE.MeshBasicMaterial({ color: 0xd1bc8a }); // Light blue for the ceiling
 const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomDepth), ceilingMaterial);
 ceiling.rotation.x = Math.PI / 2; // Rotate to lay flat
-ceiling.position.y = roomHeight / 2; // Position it at the top of the room
+ceiling.position.y = roomHeight / 2 - 0.01; // Position it at the top of the room
 scene.add(ceiling);
 
 // Painting Frame and Image
