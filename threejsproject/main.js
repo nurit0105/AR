@@ -29,7 +29,7 @@ scene.add(ambientLight);
 
 // Room Dimensions
 const roomWidth = 10;
-const roomHeight = 15;
+const roomHeight = 8;
 const roomDepth = 10;
 
 // Create the Room (Cube)
