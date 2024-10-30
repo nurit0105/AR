@@ -60,6 +60,46 @@ ceiling.rotation.x = Math.PI / 2; // Rotate to lay flat
 ceiling.position.y = roomHeight / 2 - 0.01; // Position it at the top of the room
 scene.add(ceiling);
 
+
+////////////////////// PAINTINGS! ///////////
+
+// Anzahl der Bilder und Fenster entlang einer Wand
+const numberOfPaintings = 5; // Anzahl der Bilder entlang einer Wand
+const paintingSpacing = 2; // Abstand zwischen den Bildern und Fenstern
+const wallZPosition = -roomDepth / 2 + 0.1; // Leichte Entfernung von der Wand für alle Objekte
+
+// Textur für die Bilder und Fenster laden
+const paintingTexture = textureLoader.load('assets/paintings/ai_painting.webp');
+const paintingMaterial = new THREE.MeshStandardMaterial({ map: paintingTexture });
+const windowTexture = textureLoader.load('assets/window_texture1.webp');
+const windowMaterial = new THREE.MeshStandardMaterial({ map: windowTexture });
+var spotlightItem = null;
+
+// Erstellen von Bildern und Fenstern entlang der Wand
+for (let i = 0; i < numberOfPaintings; i++) {
+  // Bestimmen der x-Position für das Objekt
+  const xPosition = -roomWidth / 2 + paintingSpacing + i * paintingSpacing * 2;
+
+  // Prüfen, ob es sich um ein Bild oder ein Fenster handeln soll
+  const isPainting = i % 2 === 0 || i === 0 || i === numberOfPaintings - 1;
+
+  // Geometrie und Material auswählen
+  const geometry = new THREE.PlaneGeometry(2, 3); // Standardgröße für Bilder und Fenster
+  const material = isPainting ? paintingMaterial : windowMaterial;
+
+  // Neues Mesh erstellen
+  const item = new THREE.Mesh(geometry, material);
+  item.position.set(xPosition, 1, wallZPosition); // Position des Objekts anpassen
+  item.castShadow = true;
+
+  spotlightItem = item;
+  // Objekt zur Szene hinzufügen
+  scene.add(item);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 // Painting Frame and Image
 const paintingWidth = 2.5; // Increased width by 25%
 const paintingHeight = 3.75; // Increased height by 25%
@@ -73,6 +113,10 @@ const painting = new THREE.Mesh(new THREE.PlaneGeometry(paintingWidth, paintingH
 painting.position.set(0, 1, -roomDepth / 2 + 0.1); // Slightly in front of the wall
 painting.castShadow = true; // Enable shadow casting for the painting
 scene.add(painting);
+*/
+
+
+//////////////////////////////////////////////////
 
 // Spotlight for painting illumination
 const spotlight = new THREE.SpotLight(0xffffff, 2); // Spotlight focused on the painting
@@ -80,7 +124,9 @@ spotlight.position.set(0, 3, -roomDepth / 2 + 0.1); // Position it above the pai
 spotlight.angle = Math.PI / 4; // Spotlight angle
 spotlight.penumbra = 0.2; // Soft edge
 spotlight.decay = 2; // Decay of light
-spotlight.target = painting; // Target the spotlight to the painting
+spotlight.target = spotlightItem
+
+// spotlight.target = painting; // Target the spotlight to the painting
 spotlight.castShadow = true; // Enable shadow casting for the spotlight
 scene.add(spotlight);
 scene.add(spotlight.target); // Ensure the target is added to the scene
