@@ -8,8 +8,8 @@ const scene = new THREE.Scene();
 // Paintings
 
 let paintings = '{ "paintings" : [' +
-    '{ "path": "assets/paintings/1.jpg", "Description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde. "}]}'
-
+    '{ "path": "assets/paintings/1.jpg", "Description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde."},' +
+    '{ "path": "assets/paintings/2.jpg", "Description":" \'Der Schrei (norwegisch Skrik, deutsch ursprünglich auch Geschrei) ist der Titel von vier Gemälden und einer Lithografie des norwegischen Malers Edvard Munch mit weitgehend identischem Motiv, die zwischen 1893 und 1910 entstanden sind. Sie zeigen eine menschliche Figur unter einem roten Himmel, die ihre Hände gegen die Ohren presst, während sie Mund und Augen angstvoll aufreißt. Munch verarbeitete in dem Motiv eine eigene Angstattacke während eines abendlichen Spaziergangs, bei der er einen Schrei zu vernehmen meinte, der durch die Natur ging."}]}';
 const obj = JSON.parse(paintings)
 
 
@@ -71,6 +71,7 @@ scene.add(ceiling);
 
 ////////////////////// PAINTINGS! ///////////
 
+
 // Anzahl der Bilder und Fenster entlang einer Wand
 const numberOfPaintings = 5; // Anzahl der Bilder entlang einer Wand
 const paintingSpacing = 2; // Abstand zwischen den Bildern und Fenstern
@@ -107,26 +108,6 @@ for (let i = 0; i < numberOfPaintings; i++) {
   scene.add(item);
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-// Painting Frame and Image
-const paintingWidth = 2.5; // Increased width by 25%
-const paintingHeight = 3.75; // Increased height by 25%
-
-// Load Painting Texture
-const paintingTexture = new THREE.TextureLoader().load('assets/ai_painting.webp', (texture) => {
-    texture.anisotropy = renderer.capabilities.getMaxAnisotropy(); // Improve texture quality
-});
-const paintingMaterial = new THREE.MeshStandardMaterial({ map: paintingTexture });
-const painting = new THREE.Mesh(new THREE.PlaneGeometry(paintingWidth, paintingHeight), paintingMaterial);
-painting.position.set(0, 1, -roomDepth / 2 + 0.1); // Slightly in front of the wall
-painting.castShadow = true; // Enable shadow casting for the painting
-scene.add(painting);
-*/
-
-
-//////////////////////////////////////////////////
 
 // Spotlight for painting illumination
 const spotlight = new THREE.SpotLight(0xffffff, 2); // Spotlight focused on the painting
