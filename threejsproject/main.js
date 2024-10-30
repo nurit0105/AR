@@ -5,6 +5,14 @@ import { OrbitControls } from './three.js-master/examples/jsm/controls/OrbitCont
 // Create the Scene
 const scene = new THREE.Scene();
 
+// Paintings
+
+let paintings = '{ "paintings" : [' +
+    '{ "path": "assets/paintings/1.jpg", "Description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde. "}]}'
+
+const obj = JSON.parse(paintings)
+
+
 // Load textures
 const textureLoader = new THREE.TextureLoader();
 const wallTexture = textureLoader.load('assets/wall.jpg') //Wall Texture
@@ -32,9 +40,9 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white ambien
 scene.add(ambientLight);
 
 // Room Dimensions
-const roomWidth = 50;
+const roomWidth = 20;
 const roomHeight = 8;
-const roomDepth = 50;
+const roomDepth = 20;
 
 // Create the Room (Cube)
 const roomMaterial = new THREE.MeshBasicMaterial({ map: wallTexture /*color: 0xadd8e6*/, side: THREE.BackSide }); // Light blue color for walls
@@ -69,7 +77,9 @@ const paintingSpacing = 2; // Abstand zwischen den Bildern und Fenstern
 const wallZPosition = -roomDepth / 2 + 0.1; // Leichte Entfernung von der Wand für alle Objekte
 
 // Textur für die Bilder und Fenster laden
-const paintingTexture = textureLoader.load('assets/paintings/ai_painting.webp');
+//const paintingTexture = textureLoader.load('assets/paintings/ai_painting.webp');
+const paintingTexture = textureLoader.load(obj.paintings[0].path);
+
 const paintingMaterial = new THREE.MeshStandardMaterial({ map: paintingTexture });
 const windowTexture = textureLoader.load('assets/window_texture1.webp');
 const windowMaterial = new THREE.MeshStandardMaterial({ map: windowTexture });
