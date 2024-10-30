@@ -29,7 +29,7 @@ scene.add(ambientLight);
 
 // Room Dimensions
 const roomWidth = 10;
-const roomHeight = 5;
+const roomHeight = 15;
 const roomDepth = 10;
 
 // Create the Room (Cube)
@@ -45,7 +45,7 @@ const floorColor = new THREE.Color(0x8B4513); // Brown color for the floor
 const floorMaterial = new THREE.MeshStandardMaterial({ color: floorColor });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomDepth), floorMaterial);
 floor.rotation.x = -Math.PI / 2; // Rotate to lay flat
-floor.position.y = -roomHeight / 2; // Position it at the bottom of the room
+floor.position.y = -roomHeight / 2 + 0.01; // Position it at the bottom of the room
 floor.receiveShadow = true; // Enable shadow receiving
 scene.add(floor);
 
