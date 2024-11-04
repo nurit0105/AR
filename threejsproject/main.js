@@ -8,8 +8,8 @@ const scene = new THREE.Scene();
 // Paintings
 
 let paintings = '{ "paintings" : [' +
-    '{ "path": "assets/paintings/1.jpg", "description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde."},' +
-    '{ "path": "assets/paintings/2.jpg", "description":" \'Der Schrei (norwegisch Skrik, deutsch ursprünglich auch Geschrei) ist der Titel von vier Gemälden und einer Lithografie des norwegischen Malers Edvard Munch mit weitgehend identischem Motiv, die zwischen 1893 und 1910 entstanden sind. Sie zeigen eine menschliche Figur unter einem roten Himmel, die ihre Hände gegen die Ohren presst, während sie Mund und Augen angstvoll aufreißt. Munch verarbeitete in dem Motiv eine eigene Angstattacke während eines abendlichen Spaziergangs, bei der er einen Schrei zu vernehmen meinte, der durch die Natur ging."}]}';
+    '{ "no": "0", "path": "assets/paintings/1.jpg", "description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde."},' +
+    '{ "no": "1", "path": "assets/paintings/2.jpg", "description":" \'Der Schrei (norwegisch Skrik, deutsch ursprünglich auch Geschrei) ist der Titel von vier Gemälden und einer Lithografie des norwegischen Malers Edvard Munch mit weitgehend identischem Motiv, die zwischen 1893 und 1910 entstanden sind. Sie zeigen eine menschliche Figur unter einem roten Himmel, die ihre Hände gegen die Ohren presst, während sie Mund und Augen angstvoll aufreißt. Munch verarbeitete in dem Motiv eine eigene Angstattacke während eines abendlichen Spaziergangs, bei der er einen Schrei zu vernehmen meinte, der durch die Natur ging."}]}';
 const obj = JSON.parse(paintings)
 
 
@@ -111,7 +111,8 @@ for (let i = 0; i < numberOfPaintings; i++) {
 
   // Neues Mesh erstellen
   const item = new THREE.Mesh(geometry, material);
-  item.name = images[i].name;
+  item.no = images[i].no;
+  console.log(item.no)
   item.position.set(xPosition, 1, wallZPosition); // Position des Objekts anpassen
   item.castShadow = true;
 
@@ -119,9 +120,6 @@ for (let i = 0; i < numberOfPaintings; i++) {
   // Objekt zur Szene hinzufügen
   scene.add(item);
 }
-
-
-
 
 // Spotlight for painting illumination
 const spotlight = new THREE.SpotLight(0xffffff, 2); // Spotlight focused on the painting
