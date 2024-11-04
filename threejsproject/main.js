@@ -8,8 +8,8 @@ const scene = new THREE.Scene();
 // Paintings
 
 let paintings = '{ "paintings" : [' +
-    '{ "path": "assets/paintings/1.jpg", "Description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde."},' +
-    '{ "path": "assets/paintings/2.jpg", "Description":" \'Der Schrei (norwegisch Skrik, deutsch ursprünglich auch Geschrei) ist der Titel von vier Gemälden und einer Lithografie des norwegischen Malers Edvard Munch mit weitgehend identischem Motiv, die zwischen 1893 und 1910 entstanden sind. Sie zeigen eine menschliche Figur unter einem roten Himmel, die ihre Hände gegen die Ohren presst, während sie Mund und Augen angstvoll aufreißt. Munch verarbeitete in dem Motiv eine eigene Angstattacke während eines abendlichen Spaziergangs, bei der er einen Schrei zu vernehmen meinte, der durch die Natur ging."}]}';
+    '{ "path": "assets/paintings/1.jpg", "description":" \'Mona Lisa ist ein weltberühmtes Ölgemälde von Leonardo da Vinci aus der Hochphase der italienischen Renaissance Anfang des 16. Jahrhunderts. Das auf Italienisch als La Gioconda (‚die Heitere‘) – davon abgeleitet ihr französischer Name La Joconde – bekannte Bild wurde vermutlich nach der Florentinerin Lisa del Giocondo benannt. Der unter anderem im deutschsprachigen Raum gebräuchliche Titel Mona Lisa beruht auf einem Rechtschreibfehler, denn Mona leitet sich von der italienischen Kurzform Monna (für Madonna ‚Frau‘) ab, und ist demnach also kein Vorname, sondern der Titel, mit dem Lisa als Ehefrau (madonna) von Francesco del Giocondo angeredet wurde."},' +
+    '{ "path": "assets/paintings/2.jpg", "description":" \'Der Schrei (norwegisch Skrik, deutsch ursprünglich auch Geschrei) ist der Titel von vier Gemälden und einer Lithografie des norwegischen Malers Edvard Munch mit weitgehend identischem Motiv, die zwischen 1893 und 1910 entstanden sind. Sie zeigen eine menschliche Figur unter einem roten Himmel, die ihre Hände gegen die Ohren presst, während sie Mund und Augen angstvoll aufreißt. Munch verarbeitete in dem Motiv eine eigene Angstattacke während eines abendlichen Spaziergangs, bei der er einen Schrei zu vernehmen meinte, der durch die Natur ging."}]}';
 const obj = JSON.parse(paintings)
 
 
@@ -73,7 +73,8 @@ scene.add(ceiling);
 
 
 // Anzahl der Bilder und Fenster entlang einer Wand
-const numberOfPaintings = 5; // Anzahl der Bilder entlang einer Wand
+const numberOfPaintings =  obj.paintings.length; // Anzahl der Bilder entlang einer Wand
+const numberOfWindows = 3;
 const paintingSpacing = 2; // Abstand zwischen den Bildern und Fenstern
 const wallZPosition = -roomDepth / 2 + 0.1; // Leichte Entfernung von der Wand für alle Objekte
 
@@ -81,25 +82,36 @@ const wallZPosition = -roomDepth / 2 + 0.1; // Leichte Entfernung von der Wand f
 //const paintingTexture = textureLoader.load('assets/paintings/ai_painting.webp');
 const paintingTexture = textureLoader.load(obj.paintings[0].path);
 
-const paintingMaterial = new THREE.MeshStandardMaterial({ map: paintingTexture });
 const windowTexture = textureLoader.load('assets/window_texture1.webp');
 const windowMaterial = new THREE.MeshStandardMaterial({ map: windowTexture });
 var spotlightItem = null;
+
+var images = [5]
+for (let i = 0; i <numberOfPaintings; i++) {
+  images[i] = obj.paintings[i]
+  images[i].isActive = false;
+  images[i].texture = textureLoader.load(obj.paintings[i].path);
+  console.log(images[i])
+}
+images.forEach((image) => {
+  //image.description = "new";
+})
+
 
 // Erstellen von Bildern und Fenstern entlang der Wand
 for (let i = 0; i < numberOfPaintings; i++) {
   // Bestimmen der x-Position für das Objekt
   const xPosition = -roomWidth / 2 + paintingSpacing + i * paintingSpacing * 2;
 
-  // Prüfen, ob es sich um ein Bild oder ein Fenster handeln soll
-  const isPainting = i % 2 === 0 || i === 0 || i === numberOfPaintings - 1;
-
   // Geometrie und Material auswählen
   const geometry = new THREE.PlaneGeometry(2, 3); // Standardgröße für Bilder und Fenster
-  const material = isPainting ? paintingMaterial : windowMaterial;
+
+  const texture = new THREE.TextureLoader().load(images[i].path )
+  const material = new THREE.MeshStandardMaterial({ map: texture });
 
   // Neues Mesh erstellen
   const item = new THREE.Mesh(geometry, material);
+  item.name = images[i].name;
   item.position.set(xPosition, 1, wallZPosition); // Position des Objekts anpassen
   item.castShadow = true;
 
@@ -107,6 +119,8 @@ for (let i = 0; i < numberOfPaintings; i++) {
   // Objekt zur Szene hinzufügen
   scene.add(item);
 }
+
+
 
 
 // Spotlight for painting illumination
