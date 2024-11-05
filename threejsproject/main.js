@@ -89,7 +89,6 @@ var spotlightItem = null;
 var images = [5]
 for (let i = 0; i <numberOfPaintings; i++) {
   images[i] = obj.paintings[i]
-  images[i].isActive = false;
   images[i].texture = textureLoader.load(obj.paintings[i].path);
   console.log(images[i])
 }
@@ -111,6 +110,9 @@ for (let i = 0; i < numberOfPaintings; i++) {
 
   // Neues Mesh erstellen
   const item = new THREE.Mesh(geometry, material);
+  item.isImage = true;
+  item.isActive = false;
+
   item.no = images[i].no;
   console.log(item.no)
   item.position.set(xPosition, 1, wallZPosition); // Position des Objekts anpassen
@@ -134,6 +136,7 @@ spotlight.castShadow = true; // Enable shadow casting for the spotlight
 scene.add(spotlight);
 scene.add(spotlight.target); // Ensure the target is added to the scene
 
+
 // Add Orbit Controls for mouse interaction
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // Enables smooth movement
@@ -143,11 +146,51 @@ controls.minPolarAngle = Math.PI / 4; // Limit looking up
 controls.maxPolarAngle = Math.PI / 2; // Limit looking down
 controls.enablePan = false; // Disable panning
 
+
+
+
+
+//////////////////////////////////////////// RAYCASTER!
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+// Raycaster
+
+
+
+
+function onPointerMove(event){
+  pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  //event.hasEventListener( 'click', moveIt(pointer) );
+  console.log("moving")
+}
+
+function onPointerDown(event){
+  // update the picking ray with the camera and pointer position
+  raycaster.setFromCamera( pointer, camera );
+
+  // calculate objects intersecting the picking ray
+  const intersects = raycaster.intersectObjects( scene.children );
+  for ( let i = 0; i < intersects.length; i ++ ) {
+    let object = intersects[i].object;
+    if(object.isImage){
+      object.isActive = !object.isActive;
+      if(object.isActive){
+        object.scale.set(2,2,2);
+      }else{
+        object.scale.set(1,1,1);
+      }
+    }
+  }
+}
+
+window.addEventListener( 'pointermove', onPointerMove );
+window.addEventListener( 'click', onPointerDown );
+
 // Animation Loop
 function animate() {
-  requestAnimationFrame(animate);
   controls.update(); // Update controls
   renderer.render(scene, camera);
 }
-
-animate();
+renderer.setAnimationLoop( animate );
