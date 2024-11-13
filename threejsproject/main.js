@@ -2,6 +2,10 @@
 // Import Three.js library
 import * as THREE from 'three';
 import { OrbitControls } from './three.js-master/examples/jsm/controls/OrbitControls.js'; // Ensure correct path
+import { VRButton } from './three.js-master/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from './three.js-master/examples/jsm/webxr/XRControllerModelFactory.js';
+
+
 
 // Create the Scene
 const scene = new THREE.Scene();
@@ -29,10 +33,12 @@ camera.position.set(0, 1.5, 5); // Set camera lower for a more realistic viewpoi
 
 // Create the Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.xr.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true; // Enable shadows
 document.getElementById('canvas-container').appendChild(renderer.domElement);
+document.body.appendChild(VRButton.createButton(renderer));
 
 // Resize the renderer on window resize
 window.addEventListener('resize', () => {
@@ -272,6 +278,91 @@ function closeFullscreen() {
 
 window.addEventListener( 'pointermove', onPointerMove );
 window.addEventListener( 'click', onPointerDown );
+
+
+
+/////// AR CONTROLLER!
+
+
+// Controller-Model Factory für visuelle Darstellung
+const controllerModelFactory = new XRControllerModelFactory();
+
+// Erstelle VR-Controller
+const controller1 = renderer.xr.getController(0); // Controller 1 als Interaktion
+controller1.addEventListener('selectstart', onSelectStart);
+controller1.addEventListener('selectend', onSelectEnd);
+scene.add(controller1);
+
+const controller2 = renderer.xr.getController(1); // Controller 2 als Interaktion
+controller2.addEventListener('selectstart', onSelectStart);
+controller2.addEventListener('selectend', onSelectEnd);
+scene.add(controller2);
+
+// Controller-Grips (für physische Darstellung)
+const controllerGrip1 = renderer.xr.getControllerGrip(0);
+controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
+scene.add(controllerGrip1);
+
+const controllerGrip2 = renderer.xr.getControllerGrip(1);
+controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
+scene.add(controllerGrip2);
+
+// Funktionen für Interaktionen mit den Controllern
+function onSelectStart(event) {
+  const controller = event.target;
+  const intersects = getIntersections(controller);
+
+  for (let i = 0; i < intersects.length; i++) {
+    const object = intersects[i].object;
+
+    if (object.isImage) {
+      // Überprüfen, ob dasselbe Bild erneut angeklickt wurde
+      if (activePainting === object && !isFullscreen) {
+        openFullscreen(object); // Vollbildmodus aufrufen
+        return;
+      }
+
+      // Bild vergrößern und aktiv setzen
+      if (activePainting) {
+        activePainting.scale.set(1, 1, 1); // Setze vorheriges Bild zurück
+      }
+      object.scale.set(2, 2, 2); // Vergrößere aktuelles Bild
+      activePainting = object;
+
+      // Zeige die Textbeschreibung an
+      const paintingInfo = obj.paintings.find(p => p.no == object.no);
+      if (paintingInfo) {
+        descriptionContainer.innerText = paintingInfo.description;
+        descriptionContainer.style.display = 'block';
+      }
+      break; // Nur ein Objekt gleichzeitig verarbeiten
+    }
+  }
+}
+
+function onSelectEnd(event) {
+  const controller = event.target;
+
+  // Entferne die Hervorhebung oder beende die Aktion
+  if (controller.userData.selected !== undefined) {
+    const selectedObject = controller.userData.selected;
+    selectedObject.material.emissive.setHex(0x000000); // Farbe zurücksetzen
+    controller.userData.selected = undefined;
+  }
+}
+
+// Raycasting-Funktion für Controller-Interaktionen
+const tempMatrix = new THREE.Matrix4();
+function getIntersections(controller) {
+  const raycaster = new THREE.Raycaster();
+  tempMatrix.identity().extractRotation(controller.matrixWorld);
+  raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+  raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+  return raycaster.intersectObjects(scene.children, false);
+}
+
+
 
 // Animation Loop
 function animate() {
