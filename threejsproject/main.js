@@ -240,6 +240,7 @@ function onPointerDown(event) {
       if (paintingInfo) {
         descriptionContainer.innerText = paintingInfo.description;
         descriptionContainer.style.display = 'block';
+        speakText(paintingInfo.description);
       }
       break; // Nur ein Objekt gleichzeitig verarbeiten
     }
@@ -280,8 +281,6 @@ window.addEventListener( 'pointermove', onPointerMove );
 window.addEventListener( 'click', onPointerDown );
 
 
-
-/////// AR CONTROLLER!
 
 
 // Controller-Model Factory für visuelle Darstellung
@@ -326,9 +325,11 @@ function onSelectStartVR(event) {
       if (activePainting) activePainting.scale.set(1, 1, 1);
       object.scale.set(2, 2, 2);
       activePainting = object;
-
       const paintingInfo = obj.paintings.find(p => p.no == object.no);
-      if (paintingInfo) createText(paintingInfo.description);
+
+      if (paintingInfo) {
+        innerTextWindow(paintingInfo.description);
+      }
       break;
     }
   }
@@ -362,25 +363,35 @@ function getIntersections(controller) {
 
 ////////////////////////////////////////////
 // Function to create text within VR scene
-function createText(description) {
-  const loader = new THREE.FontLoader();
-  loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-    const textGeometry = new THREE.TextGeometry(description, {
-      font: font,
-      size: 0.2,
-      height: 0.01,
-    });
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
-    // Position the text slightly below the camera
-    textMesh.position.set(camera.position.x, camera.position.y - 0.5, camera.position.z - 1);
-    textMesh.lookAt(camera.position);
-    scene.add(textMesh);
-  });
+
+function innerTextWindow(text) {
+// Erstelle ein weiteres Mesh für die Text-UI
+  const uiMaterial = new THREE.MeshBasicMaterial({color: 0x333333, side: THREE.DoubleSide});
+  const uiGeometry = new THREE.PlaneGeometry(2, 1);
+  const uiMesh = new THREE.Mesh(uiGeometry, uiMaterial);
+
+// UI-Element über dem Fenster positionieren
+  // UI-Element über dem Fenster positionieren
+  uiMesh.position.set(0, -1, -3);
+  scene.add(uiMesh);
+
+// Interaktive Texte für UI anzeigen
+  const uiCanvas = document.createElement('canvas');
+  uiCanvas.width = 512;
+  uiCanvas.height = 256;
+  const uiContext = uiCanvas.getContext('2d');
+  uiContext.fillStyle = 'white';
+  uiContext.font = '15px Arial';
+  uiContext.fillText(text,2,4);
+
+// Canvas-Textur für das UI erstellen
+  const uiTexture = new THREE.CanvasTexture(uiCanvas);
+  const uiMaterialWithTexture = new THREE.MeshBasicMaterial({ map: uiTexture, side: THREE.DoubleSide });
+
+// UI-Mesh aktualisieren
+  uiMesh.material = uiMaterialWithTexture;
 }
-
-
 
 
 
