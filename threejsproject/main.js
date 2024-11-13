@@ -318,27 +318,18 @@ function onSelectStartVR(event) {
     const object = intersects[i].object;
 
     if (object.isImage) {
-      // Überprüfen, ob dasselbe Bild erneut angeklickt wurde
       if (activePainting === object && !isFullscreen) {
-        openFullscreen(object); // Vollbildmodus aufrufen
+        openFullscreen(object);
         return;
       }
 
-      // Bild vergrößern und aktiv setzen
-      if (activePainting) {
-        activePainting.scale.set(1, 1, 1); // Setze vorheriges Bild zurück
-      }
-      object.scale.set(2, 2, 2); // Vergrößere aktuelles Bild
+      if (activePainting) activePainting.scale.set(1, 1, 1);
+      object.scale.set(2, 2, 2);
       activePainting = object;
 
-      // Zeige die Textbeschreibung an
       const paintingInfo = obj.paintings.find(p => p.no == object.no);
-      if (paintingInfo) {
-        descriptionContainer.innerText = paintingInfo.description;
-        descriptionContainer.style.display = 'block';
-        descriptionContainer.style.bottom = '50px';
-      }
-      break; // Nur ein Objekt gleichzeitig verarbeiten
+      if (paintingInfo) createText(paintingInfo.description);
+      break;
     }
   }
 }
@@ -373,7 +364,7 @@ function getIntersections(controller) {
 // Function to create text within VR scene
 function createText(description) {
   const loader = new THREE.FontLoader();
-  loader.load('path/to/font.json', function (font) {
+  loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
     const textGeometry = new THREE.TextGeometry(description, {
       font: font,
       size: 0.2,
