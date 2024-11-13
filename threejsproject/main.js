@@ -166,7 +166,7 @@ controls.enablePan = false; // Disable panning
 // HTML-Container für Beschreibung und maximiertes Bild erstellen
 const descriptionContainer = document.createElement('div');
 descriptionContainer.style.position = 'absolute';
-descriptionContainer.style.bottom = '20px';
+descriptionContainer.style.bottom = '60px';
 descriptionContainer.style.width = '100%';
 descriptionContainer.style.textAlign = 'center';
 descriptionContainer.style.color = 'white';
@@ -289,13 +289,13 @@ const controllerModelFactory = new XRControllerModelFactory();
 
 // Erstelle VR-Controller
 const controller1 = renderer.xr.getController(0); // Controller 1 als Interaktion
-controller1.addEventListener('selectstart', onSelectStart);
-controller1.addEventListener('selectend', onSelectEnd);
+controller1.addEventListener('selectstart', onSelectStartVR);
+controller1.addEventListener('selectend', onSelectEndVR);
 scene.add(controller1);
 
 const controller2 = renderer.xr.getController(1); // Controller 2 als Interaktion
-controller2.addEventListener('selectstart', onSelectStart);
-controller2.addEventListener('selectend', onSelectEnd);
+controller2.addEventListener('selectstart', onSelectStartVR);
+controller2.addEventListener('selectend', onSelectEndVR);
 scene.add(controller2);
 
 // Controller-Grips (für physische Darstellung)
@@ -307,8 +307,10 @@ const controllerGrip2 = renderer.xr.getControllerGrip(1);
 controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
 scene.add(controllerGrip2);
 
+
+
 // Funktionen für Interaktionen mit den Controllern
-function onSelectStart(event) {
+function onSelectStartVR(event) {
   const controller = event.target;
   const intersects = getIntersections(controller);
 
@@ -334,19 +336,24 @@ function onSelectStart(event) {
       if (paintingInfo) {
         descriptionContainer.innerText = paintingInfo.description;
         descriptionContainer.style.display = 'block';
+        descriptionContainer.style.bottom = '50px';
       }
       break; // Nur ein Objekt gleichzeitig verarbeiten
     }
   }
 }
 
-function onSelectEnd(event) {
+function onSelectEndVR(event) {
   const controller = event.target;
 
   // Entferne die Hervorhebung oder beende die Aktion
   if (controller.userData.selected !== undefined) {
-    const selectedObject = controller.userData.selected;
-    selectedObject.material.emissive.setHex(0x000000); // Farbe zurücksetzen
+    //const selectedObject = controller.userData.selected;
+    if(isFullscreen){
+      closeFullscreen()
+    }
+
+    //selectedObject.material.emissive.setHex(0x000000); // Farbe zurücksetzen
     controller.userData.selected = undefined;
   }
 }
@@ -361,6 +368,28 @@ function getIntersections(controller) {
 
   return raycaster.intersectObjects(scene.children, false);
 }
+
+////////////////////////////////////////////
+// Function to create text within VR scene
+function createText(description) {
+  const loader = new THREE.FontLoader();
+  loader.load('path/to/font.json', function (font) {
+    const textGeometry = new THREE.TextGeometry(description, {
+      font: font,
+      size: 0.2,
+      height: 0.01,
+    });
+    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+    // Position the text slightly below the camera
+    textMesh.position.set(camera.position.x, camera.position.y - 0.5, camera.position.z - 1);
+    textMesh.lookAt(camera.position);
+    scene.add(textMesh);
+  });
+}
+
+
 
 
 
