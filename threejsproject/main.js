@@ -152,8 +152,27 @@ controls.enablePan = false; // Disable panning
 
 //////////////////////////////////////////// RAYCASTER!
 
+const descriptionContainer = document.createElement('div');
+descriptionContainer.style.position = 'absolute';
+descriptionContainer.style.bottom = '20px';
+descriptionContainer.style.width = '100%';
+descriptionContainer.style.textAlign = 'center';
+descriptionContainer.style.color = 'white';
+descriptionContainer.style.fontSize = '1.2em';
+descriptionContainer.style.fontFamily = 'Arial, sans-serif';
+descriptionContainer.style.display = 'none'; // Anfangs ausblenden
+descriptionContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+document.body.appendChild(descriptionContainer);
+
+
+
+
+
+
+
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+let activePainting = null;
 // Raycaster
 
 
@@ -166,21 +185,36 @@ function onPointerMove(event){
   console.log("moving")
 }
 
-function onPointerDown(event){
-  // update the picking ray with the camera and pointer position
-  raycaster.setFromCamera( pointer, camera );
+function onPointerDown(event) {
+  // Raycaster aktualisieren und auf Objekte prüfen
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(scene.children);
 
-  // calculate objects intersecting the picking ray
-  const intersects = raycaster.intersectObjects( scene.children );
-  for ( let i = 0; i < intersects.length; i ++ ) {
+  for (let i = 0; i < intersects.length; i++) {
     let object = intersects[i].object;
-    if(object.isImage){
-      object.isActive = !object.isActive;
-      if(object.isActive){
-        object.scale.set(2,2,2);
-      }else{
-        object.scale.set(1,1,1);
+
+    if (object.isImage) {
+      // Wenn dasselbe Bild erneut angeklickt wird, schließen
+      if (activePainting === object) {
+        object.scale.set(1, 1, 1); // Zurück zur Originalgröße
+        activePainting = null;
+        descriptionContainer.style.display = 'none'; // Beschreibung ausblenden
+      } else {
+        // Aktives Bild vergrößern und Beschreibung anzeigen
+        if (activePainting) {
+          activePainting.scale.set(1, 1, 1); // Vorheriges Bild zurücksetzen
+        }
+        object.scale.set(2, 2, 2); // Vergrößern
+        activePainting = object;
+
+        // Textbeschreibung aktualisieren
+        const paintingInfo = obj.paintings.find(p => p.no == object.no);
+        if (paintingInfo) {
+          descriptionContainer.innerText = paintingInfo.description;
+          descriptionContainer.style.display = 'block';
+        }
       }
+      break; // Nur ein Objekt gleichzeitig verarbeiten
     }
   }
 }
