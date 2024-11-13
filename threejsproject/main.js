@@ -151,7 +151,7 @@ controls.enablePan = false; // Disable panning
 
 
 //////////////////////////////////////////// RAYCASTER!
-
+// HTML-Container für Beschreibung und maximiertes Bild erstellen
 const descriptionContainer = document.createElement('div');
 descriptionContainer.style.position = 'absolute';
 descriptionContainer.style.bottom = '20px';
@@ -166,17 +166,27 @@ document.body.appendChild(descriptionContainer);
 
 
 
-
+// Container für maximiertes Bild
+const fullscreenContainer = document.createElement('div');
+fullscreenContainer.style.position = 'fixed';
+fullscreenContainer.style.top = '0';
+fullscreenContainer.style.left = '0';
+fullscreenContainer.style.width = '100vw';
+fullscreenContainer.style.height = '100vh';
+fullscreenContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+fullscreenContainer.style.display = 'none'; // Anfangs ausblenden
+fullscreenContainer.style.alignItems = 'center';
+fullscreenContainer.style.justifyContent = 'center';
+fullscreenContainer.style.cursor = 'pointer';
+document.body.appendChild(fullscreenContainer);
 
 
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let activePainting = null;
+let isFullscreen = false;
 // Raycaster
-
-
-
 
 function onPointerMove(event){
   pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -186,6 +196,12 @@ function onPointerMove(event){
 }
 
 function onPointerDown(event) {
+  // Prüfen, ob ein maximiertes Bild angezeigt wird
+  if (isFullscreen) {
+    closeFullscreen();
+    return;
+  }
+
   // Raycaster aktualisieren und auf Objekte prüfen
   raycaster.setFromCamera(pointer, camera);
   const intersects = raycaster.intersectObjects(scene.children);
@@ -194,28 +210,57 @@ function onPointerDown(event) {
     let object = intersects[i].object;
 
     if (object.isImage) {
-      // Wenn dasselbe Bild erneut angeklickt wird, schließen
-      if (activePainting === object) {
-        object.scale.set(1, 1, 1); // Zurück zur Originalgröße
-        activePainting = null;
-        descriptionContainer.style.display = 'none'; // Beschreibung ausblenden
-      } else {
-        // Aktives Bild vergrößern und Beschreibung anzeigen
-        if (activePainting) {
-          activePainting.scale.set(1, 1, 1); // Vorheriges Bild zurücksetzen
-        }
-        object.scale.set(2, 2, 2); // Vergrößern
-        activePainting = object;
+      // Zweiter Klick auf dasselbe Bild -> Vollbildmodus
+      if (activePainting === object && !isFullscreen) {
+        openFullscreen(object);
+        return;
+      }
 
-        // Textbeschreibung aktualisieren
-        const paintingInfo = obj.paintings.find(p => p.no == object.no);
-        if (paintingInfo) {
-          descriptionContainer.innerText = paintingInfo.description;
-          descriptionContainer.style.display = 'block';
-        }
+      // Bild vergrößern und Beschreibung anzeigen
+      if (activePainting) {
+        activePainting.scale.set(1, 1, 1); // Vorheriges Bild zurücksetzen
+      }
+      object.scale.set(2, 2, 2); // Vergrößern
+      activePainting = object;
+
+      // Textbeschreibung anzeigen
+      const paintingInfo = obj.paintings.find(p => p.no == object.no);
+      if (paintingInfo) {
+        descriptionContainer.innerText = paintingInfo.description;
+        descriptionContainer.style.display = 'block';
       }
       break; // Nur ein Objekt gleichzeitig verarbeiten
     }
+  }
+}
+
+
+// Funktion, um das Bild im Vollbildmodus zu öffnen
+function openFullscreen(object) {
+  const paintingInfo = obj.paintings.find(p => p.no == object.no);
+  if (paintingInfo) {
+    const img = document.createElement('img');
+    img.src = paintingInfo.path;
+    img.style.maxWidth = '90vw';
+    img.style.maxHeight = '90vh';
+
+    fullscreenContainer.innerHTML = ''; // Vorherigen Inhalt entfernen
+    fullscreenContainer.appendChild(img);
+    fullscreenContainer.style.display = 'flex';
+    isFullscreen = true;
+    descriptionContainer.style.display = 'none'; // Beschreibung ausblenden
+  }
+}
+
+// Funktion, um den Vollbildmodus zu schließen
+function closeFullscreen() {
+  fullscreenContainer.style.display = 'none';
+  isFullscreen = false;
+
+  // Zurück zur Vergrößerung
+  if (activePainting) {
+    activePainting.scale.set(2, 2, 2);
+    descriptionContainer.style.display = 'block'; // Beschreibung wieder einblenden
   }
 }
 
